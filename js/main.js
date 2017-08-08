@@ -74,6 +74,29 @@ function deleteLocalItem(id,status){
 	}
 }
 
+function pendingSwitcher(id){
+	var entries = JSON.parse(localStorage.getItem('pendingList'));
+	var confirmedList = JSON.parse(localStorage.getItem('confirmedList'));
+	if(confirmedList === null){
+		confirmedList =[];
+	}
+	if(entries === null){
+		entries =[];
+	}
+	for(var i = 0; i < entries.length; i++){
+		if(id == entries[i].id){
+			var tempEntry = entries[i];
+			tempEntry.status = "recieved";
+			entries.splice(i,1); //taking item out of pending list
+			localStorage.setItem("pendingList",JSON.stringify(entries));
+			confirmedList.push(tempEntry);
+			localStorage.setItem("confirmedList",JSON.stringify(confirmedList));
+		}
+	}
+fetchData("recieved");
+fetchData("pending");
+}
+
 function fetchData(status) {
 	console.log("Running fetchData");
 	if(status === "recieved"){
@@ -90,7 +113,7 @@ function fetchData(status) {
 			var identity = entries[i].id;
 			var status = entries[i].status;
 
-			confirmedList.innerHTML += '<div class = "well"'+
+			confirmedList.innerHTML += '<div class = "well" >'+
 								'<p><span class =  "label">'+ rDate+'</span>'+
 								'<span class =  "label">'+ appName+'</span>'+
 								'<span class =  "label">'+ paymentType+'</span>'+
@@ -115,13 +138,14 @@ function fetchData(status) {
 			var identity = entries[i].id;
 			var status = entries[i].status;
 
-			pendingList.innerHTML += '<div class = "well"'+
+			pendingList.innerHTML += '<div class = "well" style = "background-color : grey ">'+
 								'<p><span class =  "label">'+ rDate+'</span>'+
 								'<span class =  "label">'+ appName+'</span>'+
 								'<span class =  "label">'+ paymentType+'</span>'+
 								'<span class = "label">' + price + '</span>'+
 								'<a href="#" onclick="deleteLocalItem(\''+identity+'\',\''+ status+ '\')"class="btn btn-danger">Delete</a>'+
                               	//'<a href="#" "class="btn btn-danger">Delete</a>'+
+								'<a href ="#" onclick = "pendingSwitcher(\''+identity+'\')" class="btn btn-success">Recieved</a>'+
 							  '</div>';
 		}
 	}
